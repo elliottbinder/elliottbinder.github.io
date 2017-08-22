@@ -1,3 +1,5 @@
 name: Elliott Binder, Kind of Boring
 markdown: kramdown
 permalink: /blog/:year/:month/:day/:title
+# Google services
+google_analytics: UA—66135161-1
