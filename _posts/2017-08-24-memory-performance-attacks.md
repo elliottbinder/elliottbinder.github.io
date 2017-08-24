@@ -1,0 +1,16 @@
+---
+layout: post
+title: "3 - Memory Performance Attacks: Denial of Memory Service in Multi-Core Systems"
+date: 2017-08-24
+author: Moscibroda, Thomas; Mutlu, Onur (MSR-TR-2007-15)
+source: https://www.microsoft.com/en-us/research/publication/memory-performance-attacks-denial-of-memory-service-in-multi-core-systems/
+---
+
+Moscribroda and Mutlu's research brings to light a possible Denial of Service (DoS) attack on the memory systems of multi-core systems.  The vulnerability stems from the First-Ready First-Come-First-Serve (FR-FCFS) scheduling algorithm typically employed by memory controllers.  A DRAM bank has many rows that must share a row buffer to be accessed by the memory controller.  Since swapping the row being held by the row buffer incurs latency, FR-FCFS prioritizes memory requests for addresses that fall onto the row that's held in the row buffer to reduce overall latency.  Although FR-FCFS improves throughput, it does not exhibit fairness between cores.  An application that exhibits high row buffer locality -- called **memory performance hogs** (MPHs) -- can therefore monopolize memory usage and deny service to applications with lower row buffer locality.
+
+Through experimentation, they were able to confirm their hypothesis running benchmark programs *stream* (an MPH program that accesses large arrays in sequential order) and *rdarray* (a program that accesses large arrays in a random order) on the same system concurrently.  The slowdown experienced by *stream* was much less than that of *rdarray*, and running them in higher-core systems amplified the MPH's effect.  This emphasizes the importance of this vulnerability as system designers look to increasing cores as a primary source of improved performance.
+
+
+It is noted that trying to establish fairness by equalizing the latencies experienced by different threads disregards the locality of programs and is not suitable in the context of memory systems.  To solve this problem, Moscribroda and Mutlu introduce a fair DRAM memory system by dissecting the memory latency of a program to be of two parts: 1) latency that is inherent in the program due to its row buffer locality (this is what it would experience if it were run on a system without sharing the DRAM system) and 2) latency that is introduced by the DRAM being shared with other programs (this happens when another program needs to swap in a row to the row buffer).  Their **FairMem** algorithm aims to balance the relative slowdowns experienced by different threads by maintaining a slowdown index, which is the ratio between a thread's cumulated latency and its ideal single-core cumulated latency.  Once the slowdown index of threads becomes unbalance, the scheduling algorithm can react to favor threads that are experiencing large slowdowns.
+
+It's impressive how pervasive this problem is, in that it can be evoked by a simple program and that it cannot be solved in software.  The FR-FCFS was first developed for single-threaded applications and has since been adopted on mutli-core systems, apparently without much thought.  This brings to light the importance of reevaluating approaches or practices that have worked in the past, but may cause problems in a new context.
