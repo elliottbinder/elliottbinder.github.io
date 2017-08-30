@@ -2,7 +2,7 @@
 layout: post
 title: "2 - Requirements, Bottlenecks, and Good Fortune: Agents for Microprocessor Evolution"
 date: 2017-08-23
-author: Patt, Yale
+author: Yale Patt
 source: http://www.ece.cmu.edu/~ece447/s12/lib/exe/fetch.php?media=wiki:18447-patt-2001.pdf
 ---
 
